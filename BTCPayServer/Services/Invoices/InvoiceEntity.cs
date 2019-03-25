@@ -387,6 +387,31 @@ namespace BTCPayServer.Services.Invoices
                 PaymentCodes = new Dictionary<string, InvoicePaymentUrls>(),
                 ExchangeRates = new Dictionary<string, Dictionary<string, decimal>>()
             };
+            
+            dto.DepositAddresses = GetPayments()
+                .Select(payment =>
+                {
+                    var paymentData = payment.GetCryptoPaymentData();
+                    var paymentNetwork = networkProvider.GetNetwork(payment.GetCryptoCode());
+                    if (paymentData is Payments.Bitcoin.BitcoinLikePaymentData onChainPaymentData)
+                    {
+                        return onChainPaymentData.GetDestination(paymentNetwork).ToString();
+                    }
+                    return "";
+                })
+                .ToList();
+
+            dto.TransactionIds = GetPayments()
+                .Select(_ =>
+                {
+                    var paymentData = _.GetCryptoPaymentData();
+                    if (paymentData is Payments.Bitcoin.BitcoinLikePaymentData onChainPaymentData)
+                    {
+                        return onChainPaymentData.Outpoint.Hash.ToString();
+                    }
+                    return "";
+                })
+                .ToList();
 
             dto.Url = ServerUrl.WithTrailingSlash() + $"invoice?id=" + Id;
             dto.CryptoInfo = new List<NBitpayClient.InvoiceCryptoInfo>();

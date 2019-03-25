@@ -118,6 +118,9 @@ namespace BTCPayServer.HostedServices
                 notification.Data.BTCDue = dto.BTCDue;
                 notification.Data.BTCPaid = dto.BTCPaid;
                 notification.Data.BTCPrice = dto.BTCPrice;
+                notification.Data.BitcoinAddress = dto.BitcoinAddress;
+                notification.Data.TransactionIds = dto.TransactionIds;
+                notification.Data.DepositAddresses = dto.DepositAddresses;
 #pragma warning restore CS0618
             }
 
