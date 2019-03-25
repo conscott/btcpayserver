@@ -83,6 +83,12 @@ namespace BTCPayServer.Models
         [JsonProperty("cryptoInfo")]
         public List<NBitpayClient.InvoiceCryptoInfo> CryptoInfo { get; set; }
 
+        [JsonProperty("transactionIds")]
+        public List<string> TransactionIds { get; set; }
+        
+        [JsonProperty("depositAddresses")]
+        public List<string> DepositAddresses { get; set; }
+
         //"price":5
         [JsonProperty("price")]
         public decimal Price

@@ -13,6 +13,7 @@ function Cart() {
     this.$summaryDiscount = $('.js-cart-summary-discount');
     this.$summaryTotal = $('.js-cart-summary-total');
     this.$summaryTip = $('.js-cart-summary-tip');
+    this.$summaryOrderId = $('.js-cart-summary-orderid');
     this.$destroy = $('.js-cart-destroy');
     this.$confirm = $('#js-cart-confirm');
 
@@ -21,6 +22,7 @@ function Cart() {
     
     this.updateItemsCount();
     this.updateAmount();
+    this.updateOrderIdPersist();
     this.updatePosData();
 }
 
@@ -46,6 +48,7 @@ Cart.prototype.getCustomAmount = function() {
 
     return this.toCents(this.customAmount);
 }
+
 
 Cart.prototype.setTip = function(amount) {
     if (!srvModel.enableTips) {
@@ -91,6 +94,24 @@ Cart.prototype.getDiscount = function() {
     }
 
     return this.toCents(this.discount);
+}
+
+Cart.prototype.setOrderId = function(val) {
+
+    // TODO check if order id is valid
+    this.orderid = val;
+
+    if (this.orderid !== '') {
+        localStorage.setItem(this.getStorageKey('cartOrderId'), this.orderid);
+    } else {
+        localStorage.removeItem(this.getStorageKey('cartOrderId'));
+    }
+    return this.orderid;
+}
+
+Cart.prototype.getOrderId = function() {
+    // TODO add to srvModel
+    return this.orderid;
 }
 
 Cart.prototype.getDiscountAmount = function(amount) {
@@ -272,6 +293,7 @@ Cart.prototype.updateAll = function() {
     this.updateSummaryTotal();
     this.updateTotal();
     this.updateAmount();
+    this.updateOrderIdPersist();
     this.updatePosData();
 }
 
@@ -316,10 +338,20 @@ Cart.prototype.updateTip = function(amount) {
     this.$summaryTip.text(this.formatCurrency(tip));
 }
 
+// Update tip amount in the summary
+Cart.prototype.updateOrderId = function() {
+    this.$summaryOrderId.text(this.getOrderId());
+}
+
 // Update hidden total amount value to be sent to the checkout page
 Cart.prototype.updateAmount = function() {
     $('#js-cart-amount').val(this.getTotal(true));
 }
+
+Cart.prototype.updateOrderIdPersist = function() {
+    $('#js-cart-orderid-persist').val(this.getOrderId());
+}
+
 Cart.prototype.updatePosData = function() {
 
     var result = {
@@ -339,6 +371,12 @@ Cart.prototype.resetDiscount = function() {
     this.setDiscount(0);
     this.updateDiscount(0);
     $('.js-cart-discount').val('');
+}
+
+Cart.prototype.resetOrderId = function() {
+    this.setOrderId('');
+    this.updateOrderId('');
+    $('.js-cart-orderid').val('');
 }
 
 Cart.prototype.resetTip = function() {
@@ -382,6 +420,7 @@ Cart.prototype.buildUI = function() {
 
     tableTemplate = this.template($('#template-cart-extra'), {
         'discount': this.escape(this.fromCents(this.getDiscount()) || ''),
+        'orderid': this.escape(this.getOrderId() || ''),
         'customAmount': this.escape(this.fromCents(this.getCustomAmount()) || '')
     });
     list.push($(tableTemplate));
@@ -396,8 +435,13 @@ Cart.prototype.buildUI = function() {
 
     // Change total when discount is changed
     $('.js-cart-discount').inputAmount(this, 'discount');
+
     // Remove discount
     $('.js-cart-discount-remove').removeAmount(this, 'discount');
+    
+    // Remove orderid
+    $('.js-cart-orderid').inputAmount(this, 'orderid');
+    $('.js-cart-orderid-remove').removeAmount(this, 'orderid');
 
     // Change total when discount is changed
     $('.js-cart-custom-amount').inputAmount(this, 'customAmount');
@@ -637,12 +681,14 @@ Cart.prototype.loadLocalStorage = function() {
     }
 
     this.discount = localStorage.getItem(this.getStorageKey('cartDiscount'));
+    this.orderid = localStorage.getItem(this.getStorageKey('cartOrderId'));
     this.customAmount = localStorage.getItem(this.getStorageKey('cartCustomAmount'));
     this.tip = localStorage.getItem(this.getStorageKey('cartTip'));
 }
 
 Cart.prototype.destroy = function(keepAmount) {
     this.resetDiscount();
+    this.resetOrderId();
     this.resetTip();
     this.resetCustomAmount();
 
@@ -680,6 +726,10 @@ $.fn.inputAmount = function(obj, type) {
                 obj.updateTotal();
                 obj.resetTip();
                 break;
+            case 'orderid':
+                obj.setOrderId($(this).val());
+                obj.updateOrderId();
+                break;
             case 'tip':
                 obj.setTip(val);
                 obj.updateTip();
@@ -688,6 +738,7 @@ $.fn.inputAmount = function(obj, type) {
 
         obj.updateSummaryTotal();
         obj.updateAmount();
+        obj.updateOrderIdPersist();
         obj.updatePosData();
         obj.emptyCartToggle();
     });
@@ -705,6 +756,9 @@ $.fn.removeAmount = function(obj, type) {
             case 'discount':
                 obj.resetDiscount();
                 obj.updateSummaryProducts();
+                break;
+            case 'orderid':
+                obj.resetOrderId();
                 break;
         }
 

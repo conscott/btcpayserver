@@ -85,6 +85,14 @@
     width: 100%;
 }
 
+#content2 {
+    min-height: 100vh;
+    transition: all 0.3s;
+    top: 0;
+    margin: auto;
+    width: 50%;
+}
+
 .bg-gray {
     background-color: #aaa;
 }
@@ -96,7 +104,7 @@
     MEDIAQUERIES
 ----------------------------------------------------- */
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     #sidebar {
         margin-right: -400px;
     }
@@ -107,6 +115,9 @@
         margin-right: 0;
     }
     #content {
+        width: 100%;
+    }
+    #content2 {
         width: 100%;
     }
     #content.active {
