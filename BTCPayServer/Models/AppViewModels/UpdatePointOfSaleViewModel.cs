@@ -23,6 +23,8 @@ namespace BTCPayServer.Models.AppViewModels
         public bool ShowDiscount { get; set; }
         [Display(Name = "Enable tips")]
         public bool EnableTips { get; set; }
+        [Display(Name = "Enable custom checkout")]
+        public bool EnableCustomCheckout { get; set; }
         public string Example1 { get; internal set; }
         public string Example2 { get; internal set; }
         public string ExampleCallback { get; internal set; }
