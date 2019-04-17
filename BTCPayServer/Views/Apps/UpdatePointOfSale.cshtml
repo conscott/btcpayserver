@@ -70,6 +70,11 @@
                         <span asp-validation-for="EnableTips" class="text-danger"></span>
                     </div>
                     <div class="form-group">
+                        <label asp-for="EnableCustomCheckout"></label>
+                        <input asp-for="EnableCustomCheckout" type="checkbox" class="form-check" />
+                        <span asp-validation-for="EnableCustomCheckout" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <label asp-for="ButtonText" class="control-label"></label>*
                         <input asp-for="ButtonText" class="form-control" />
                         <span asp-validation-for="ButtonText" class="text-danger"></span>
