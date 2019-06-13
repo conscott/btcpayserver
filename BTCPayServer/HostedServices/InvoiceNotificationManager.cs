@@ -128,12 +128,18 @@ namespace BTCPayServer.HostedServices
 
             if (!String.IsNullOrEmpty(invoice.NotificationEmail))
             {
-                var emailBody = NBitcoin.JsonConverters.Serializer.ToString(notification);
-
-                _EmailSenderFactory.GetEmailSender(invoice.StoreId).SendEmail(
-                    invoice.NotificationEmail,
-                    $"BtcPayServer Invoice Notification - ${invoice.StoreId}",
-                    emailBody);
+                // Mod to only email on on status change
+                
+                //var emailBody = NBitcoin.JsonConverters.Serializer.ToString(notification);
+                var onlySendConfirmed = true;
+                if (!onlySendConfirmed || (onlySendConfirmed && invoiceEvent.Name == InvoiceEvent.Confirmed))
+                {
+                    var emailBody = "Invoice " + notification.Data.Id + " for " + dto.Price + " " + dto.Currency + " (" + dto.BTCPrice + " BTC) now has status: " + notification.Data.Status + ".";
+                    _EmailSenderFactory.GetEmailSender(invoice.StoreId).SendEmail(
+                        invoice.NotificationEmail,
+                        $"BtcPayServer Invoice Notification - ${invoice.StoreId}",
+                        emailBody);
+                }
 
             }
             if (string.IsNullOrEmpty(invoice.NotificationURL) || !Uri.IsWellFormedUriString(invoice.NotificationURL, UriKind.Absolute))
